@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-// const bcrypt = require("bcrypt");
 
 const userSchema = new mongoose.Schema({
   username: {
@@ -14,19 +13,15 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true,
+    validate: {
+      validator: function (v) {
+        // Password must be at least 8 characters long and contain only alphanumeric characters
+        return /^(?=.*[a-zA-Z])(?=.*[0-9])(?=.{8,})/.test(v);
+      },
+      message:
+        "Password must be at least 8 characters long and contain only alphanumeric characters",
+    },
   },
 });
-
-// Hash the user's password before saving it to the database
-// userSchema.pre("save", async function (next) {
-//   try {
-//     const salt = await bcrypt.genSalt(10);
-//     const hash = await bcrypt.hash(this.password, salt);
-//     this.password = hash;
-//     next();
-//   } catch (error) {
-//     next(error);
-//   }
-// });
 
 module.exports = mongoose.model("user", userSchema);

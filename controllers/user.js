@@ -1,5 +1,7 @@
 const jwt = require("jsonwebtoken");
-// const bcrypt = require("bcrypt");
+
+const bcrypt = require("bcrypt");
+
 const User = require("../models/user");
 
 require("dotenv").config();
@@ -14,13 +16,20 @@ const signUp = async (req, res) => {
       return res.status(409).json({ error: "User already exists" });
     }
 
-    // Create a new user
-    const user = await User.create({ username, email, password });
+    // encrypting the password
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Return the new user object
+    // Creating a new user with the hashed password
+    const user = await User.create({
+      username,
+      email,
+      password: hashedPassword,
+    });
+
+    // Returning the new user object
     return res.status(201).json({ user });
   } catch (error) {
-    return res.status(500).json({ error: "Server error" });
+    return res.status(500).json({ error: error.message });
   }
 };
 
@@ -33,11 +42,15 @@ const logIn = async (req, res) => {
     if (!user) {
       return res.status(401).json({ error: "Invalid email or password" });
     }
+    // console.log(user);
 
-    // const isMatch = await bcrypt.compare(password, user.password);
-    // if (!isMatch) {
-    //   return res.status(401).json({ error: "Invalid email or password" });
-    // }
+    // Comparing the provided password with the hashed password in the database
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    // console.log(isMatch);
+    if (!isMatch) {
+      return res.status(401).json({ error: "Invalid email or password" });
+    }
 
     // Generate a JWT token and return it to the client
     const token = jwt.sign(
@@ -46,9 +59,11 @@ const logIn = async (req, res) => {
       { expiresIn: "1h" }
     );
 
-    res.status(200).json({ token });
+    res.redirect(`/home?username=${user.username}&token=${token}`);
+
+    // res.status(200).json({ token });
   } catch (error) {
-    return res.status(500).json({ error: "Server error" });
+    return res.status(500).json({ error: error.message });
   }
 };
 module.exports = { signUp, logIn };
