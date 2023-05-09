@@ -33,14 +33,14 @@ const signUp = async (req, res) => {
   }
 };
 
-const logIn = async (req, res) => {
+const signIn = async (req, res) => {
   const { username, email, password } = req.body;
 
   try {
     // Check if the user exists in the database
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ $or: [{ email }, { username }] });
     if (!user) {
-      return res.status(401).json({ error: "Invalid email or password" });
+      return res.status(401).json({ error: "Invalid email or username" });
     }
     // console.log(user);
 
@@ -59,11 +59,13 @@ const logIn = async (req, res) => {
       { expiresIn: "1h" }
     );
 
-    res.redirect(`/home?username=${user.username}&token=${token}`);
+    // res.status(201).json({ user });
 
-    // res.status(200).json({ token });
+    // res.redirect(`/home?username=${user.username}&token=${token}`);
+
+    res.status(201).json({ token, user });
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
 };
-module.exports = { signUp, logIn };
+module.exports = { signUp, signIn };

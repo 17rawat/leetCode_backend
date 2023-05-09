@@ -1,16 +1,17 @@
 const express = require("express");
 const app = express();
 const user = require("./routes/user");
-const home = require("./routes/home");
+
 const problems = require("./routes/problems");
 const port = 3001;
 const connectDB = require("./config/connect");
 require("dotenv").config();
 const bodyParser = require("body-parser");
+const cors = require("cors");
+app.use(cors());
 
 app.use(bodyParser.json());
 
-app.use("/home", home);
 app.use("/problems", problems);
 
 app.use("/users", user);
