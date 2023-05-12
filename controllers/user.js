@@ -13,7 +13,9 @@ const signUp = async (req, res) => {
     // Check if the user already exists in the database
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(409).json({ error: "User already exists" });
+      return res
+        .status(409)
+        .json({ error: "User with given email already exists" });
     }
 
     // encrypting the password
@@ -49,23 +51,21 @@ const signIn = async (req, res) => {
 
     // console.log(isMatch);
     if (!isMatch) {
-      return res.status(401).json({ error: "Invalid email or password" });
+      return res.status(401).json({ error: "Invalid password" });
     }
 
     // Generate a JWT token and return it to the client
     const token = jwt.sign(
-      { email: user.email, userId: user._id },
-      process.env.JWT_SECRET, // replace with your own secret key
-      { expiresIn: "1h" }
+      {
+        id: user._id,
+      },
+      process.env.JWT_SECRET // replace with your own secret key
     );
-
-    // res.status(201).json({ user });
-
-    // res.redirect(`/home?username=${user.username}&token=${token}`);
 
     res.status(201).json({ token, user });
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
 };
+
 module.exports = { signUp, signIn };
