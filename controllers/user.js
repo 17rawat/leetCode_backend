@@ -28,8 +28,17 @@ const signUp = async (req, res) => {
       password: hashedPassword,
     });
 
+    // console.log(user);
+
+    const token = jwt.sign(
+      {
+        id: user._id,
+      },
+      process.env.JWT_SECRET // replace with your own secret key
+    );
+
     // Returning the new user object
-    return res.status(201).json({ user });
+    return res.status(201).json({ token, username, email });
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
@@ -62,7 +71,7 @@ const signIn = async (req, res) => {
       process.env.JWT_SECRET // replace with your own secret key
     );
 
-    res.status(201).json({ token, user });
+    res.status(201).json({ token, username, email });
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }

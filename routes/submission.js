@@ -1,8 +1,14 @@
 const express = require("express");
-const submission = require("../controllers/submission");
-const router = express.Router();
-// const auth = require("./middleware");
 
-router.post("/", submission);
+const {
+  postSubmission,
+  getAllSubmissions,
+  getSubmission,
+} = require("../controllers/submission");
+const router = express.Router();
+
+router.post("/", postSubmission);
+router.get("/", getAllSubmissions);
+router.get("/:id", getSubmission);
 
 module.exports = router;

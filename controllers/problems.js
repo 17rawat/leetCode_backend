@@ -12,6 +12,7 @@ const getAllProblems = async (req, res) => {
 const getproblem = async (req, res) => {
   try {
     const { id } = req.params;
+    // console.log(id);
     const problem = await Problem.findOne({ _id: id });
 
     if (!problem) {
